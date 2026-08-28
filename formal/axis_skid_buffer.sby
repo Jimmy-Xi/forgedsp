@@ -1,0 +1,15 @@
+[options]
+mode prove
+depth 20
+
+[engines]
+smtbmc boolector
+
+[script]
+read -formal -sv ../rtl/axis_skid_buffer.sv axis_skid_buffer_formal.sv
+prep -top axis_skid_buffer_formal
+
+[files]
+../rtl/axis_skid_buffer.sv
+axis_skid_buffer_formal.sv
+

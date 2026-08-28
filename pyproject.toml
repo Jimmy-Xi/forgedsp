@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "forgedsp-model"
+version = "0.1.0"
+description = "Bit-exact models and word-length exploration for ForgeDSP RTL accelerators"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Jimmy-Xi" }]
+dependencies = ["numpy>=2.0"]
+
+[project.scripts]
+forgedsp-wordlength = "forgedsp_model.wordlength:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+

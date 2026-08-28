@@ -1,0 +1,58 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  python:
+    name: Python ${{ matrix.python-version }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.12", "3.14"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -e . ruff
+      - run: python -m unittest discover -s tests/python -v
+      - run: forgedsp-wordlength --max-evm 0.01 --top 3
+      - run: ruff check src tests/python
+
+  rtl:
+    name: RTL simulation, formal and synthesis
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: YosysHQ/setup-oss-cad-suite@v3
+      - run: python -m pip install -e . "cocotb>=1.9,<2"
+      - name: Verilator lint
+        run: |
+          for source in rtl/*.sv; do
+            verilator --lint-only -Wall -Wno-fatal "$source"
+          done
+      - name: cocotb RTL scoreboards
+        run: |
+          make -C tests/cocotb/mixer SIM=icarus
+          make -C tests/cocotb/fir SIM=icarus
+          make -C tests/cocotb/fft SIM=icarus
+          make -C tests/cocotb/cordic SIM=icarus
+      - name: SymbiYosys proof
+        run: sby -f formal/axis_skid_buffer.sby
+      - name: Yosys synthesis
+        run: scripts/synth_all.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: synthesis-statistics
+          path: build/synthesis/*.log
+
