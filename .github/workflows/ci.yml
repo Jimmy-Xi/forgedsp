@@ -43,10 +43,10 @@ jobs:
           done
       - name: cocotb RTL scoreboards
         run: |
-          make -C tests/cocotb/mixer SIM=icarus
-          make -C tests/cocotb/fir SIM=icarus
-          make -C tests/cocotb/fft SIM=icarus
-          make -C tests/cocotb/cordic SIM=icarus
+          make -C tests/cocotb/mixer SIM=icarus PYTHON_BIN="$pythonLocation/bin/python"
+          make -C tests/cocotb/fir SIM=icarus PYTHON_BIN="$pythonLocation/bin/python"
+          make -C tests/cocotb/fft SIM=icarus PYTHON_BIN="$pythonLocation/bin/python"
+          make -C tests/cocotb/cordic SIM=icarus PYTHON_BIN="$pythonLocation/bin/python"
       - name: SymbiYosys proof
         run: sby -f formal/axis_skid_buffer.sby
       - name: Yosys synthesis
@@ -55,4 +55,3 @@ jobs:
         with:
           name: synthesis-statistics
           path: build/synthesis/*.log
-

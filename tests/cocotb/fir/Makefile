@@ -4,6 +4,8 @@ TOPLEVEL = axis_complex_fir
 MODULE = test_fir
 COMPILE_ARGS += -g2012
 export PYTHONPATH := $(abspath ../../../src):$(PYTHONPATH)
-COCOTB_MAKEFILES := $(shell python -c "import cocotb, os; print(os.path.join(os.path.dirname(cocotb.__file__), 'share', 'makefiles'))")
+PYTHON_BIN ?= python3
+COCOTB_CONFIG := $(shell $(PYTHON_BIN) -c "import os, sys; print(os.path.join(os.path.dirname(sys.executable), 'cocotb-config'))")
+COCOTB_MAKEFILES := $(shell $(COCOTB_CONFIG) --makefiles)
 
 include $(COCOTB_MAKEFILES)/Makefile.sim
