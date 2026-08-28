@@ -5,7 +5,6 @@ MODULE = test_fft
 COMPILE_ARGS += -g2012
 export PYTHONPATH := $(abspath ../../../src):$(PYTHONPATH)
 PYTHON_BIN ?= python3
-COCOTB_CONFIG := $(shell $(PYTHON_BIN) -c "import os, sys; print(os.path.join(os.path.dirname(sys.executable), 'cocotb-config'))")
-COCOTB_MAKEFILES := $(shell $(COCOTB_CONFIG) --makefiles)
+COCOTB_MAKEFILES := $(shell $(PYTHON_BIN) -c "import cocotb, pathlib; print(pathlib.Path(cocotb.__file__).parent / 'share' / 'makefiles')")
 
 include $(COCOTB_MAKEFILES)/Makefile.sim
