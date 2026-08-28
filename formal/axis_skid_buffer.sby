@@ -6,10 +6,9 @@ depth 20
 smtbmc boolector
 
 [script]
-read -formal -sv ../rtl/axis_skid_buffer.sv axis_skid_buffer_formal.sv
+read -formal -sv axis_skid_buffer.sv axis_skid_buffer_formal.sv
 prep -top axis_skid_buffer_formal
 
 [files]
-../rtl/axis_skid_buffer.sv
-axis_skid_buffer_formal.sv
-
+rtl/axis_skid_buffer.sv
+formal/axis_skid_buffer_formal.sv

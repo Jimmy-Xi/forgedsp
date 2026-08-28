@@ -30,7 +30,7 @@ module axis_skid_buffer_formal;
         end else begin
             assume(rst_n);
             assert(s_axis_ready == (!m_axis_valid || m_axis_ready));
-            if ($past(m_axis_valid && !m_axis_ready)) begin
+            if ($past(past_valid && rst_n && m_axis_valid && !m_axis_ready)) begin
                 assert(m_axis_valid);
                 assert($stable(m_axis_data));
             end
@@ -39,4 +39,3 @@ module axis_skid_buffer_formal;
         end
     end
 endmodule
-

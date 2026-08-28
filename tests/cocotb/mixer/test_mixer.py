@@ -2,7 +2,7 @@ import random
 
 import cocotb
 from cocotb.clock import Clock
-from cocotb.triggers import RisingEdge, Timer
+from cocotb.triggers import FallingEdge, RisingEdge, Timer
 
 from forgedsp_model import quarter_rate_mix
 
@@ -28,19 +28,26 @@ async def randomized_backpressure_matches_model(dut):
     sent = 0
     received = []
     dut.s_axis_valid.value = 0
+    cycles = 0
     while len(received) < len(samples_i):
+        cycles += 1
+        assert cycles < 1000, "stream did not complete"
+        await FallingEdge(dut.clk)
         dut.m_axis_ready.value = rng.random() > 0.35
-        if sent < len(samples_i) and int(dut.s_axis_ready.value):
+        if sent < len(samples_i):
             dut.s_axis_valid.value = 1
             dut.s_axis_i.value = samples_i[sent]
             dut.s_axis_q.value = samples_q[sent]
-            sent += 1
         else:
             dut.s_axis_valid.value = 0
-        await RisingEdge(dut.clk)
         await Timer(1, units="ns")
-        if int(dut.m_axis_valid.value) and int(dut.m_axis_ready.value):
-            received.append((dut.m_axis_i.value.signed_integer, dut.m_axis_q.value.signed_integer))
+        input_transfer = int(dut.s_axis_valid.value) and int(dut.s_axis_ready.value)
+        output_transfer = int(dut.m_axis_valid.value) and int(dut.m_axis_ready.value)
+        output_payload = (dut.m_axis_i.value.signed_integer, dut.m_axis_q.value.signed_integer)
+        await RisingEdge(dut.clk)
+        if input_transfer:
+            sent += 1
+        if output_transfer:
+            received.append(output_payload)
 
     assert received == list(zip(expected_i.tolist(), expected_q.tolist()))
-

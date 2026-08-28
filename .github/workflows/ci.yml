@@ -29,13 +29,15 @@ jobs:
   rtl:
     name: RTL simulation, formal and synthesis
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - uses: YosysHQ/setup-oss-cad-suite@v3
       - run: python -m pip install -e . "cocotb>=1.9,<2"
+      - run: sudo apt-get update && sudo apt-get install -y iverilog
+      - uses: YosysHQ/setup-oss-cad-suite@v3
       - name: Verilator lint
         run: |
           for source in rtl/*.sv; do
@@ -43,10 +45,12 @@ jobs:
           done
       - name: cocotb RTL scoreboards
         run: |
-          make -C tests/cocotb/mixer SIM=icarus
-          make -C tests/cocotb/fir SIM=icarus
-          make -C tests/cocotb/fft SIM=icarus
-          make -C tests/cocotb/cordic SIM=icarus
+          export PATH="$pythonLocation/bin:/usr/bin:$PATH"
+          unset PYTHONHOME
+          make -C tests/cocotb/mixer SIM=icarus PYTHON_BIN="$pythonLocation/bin/python"
+          make -C tests/cocotb/fir SIM=icarus PYTHON_BIN="$pythonLocation/bin/python"
+          make -C tests/cocotb/fft SIM=icarus PYTHON_BIN="$pythonLocation/bin/python"
+          make -C tests/cocotb/cordic SIM=icarus PYTHON_BIN="$pythonLocation/bin/python"
       - name: SymbiYosys proof
         run: sby -f formal/axis_skid_buffer.sby
       - name: Yosys synthesis
@@ -55,4 +59,3 @@ jobs:
         with:
           name: synthesis-statistics
           path: build/synthesis/*.log
-
