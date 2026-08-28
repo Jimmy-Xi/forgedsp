@@ -34,8 +34,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - uses: YosysHQ/setup-oss-cad-suite@v3
       - run: python -m pip install -e . "cocotb>=1.9,<2"
+      - uses: YosysHQ/setup-oss-cad-suite@v3
       - name: Verilator lint
         run: |
           for source in rtl/*.sv; do
