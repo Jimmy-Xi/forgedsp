@@ -43,6 +43,7 @@ jobs:
           done
       - name: cocotb RTL scoreboards
         run: |
+          export PATH="$pythonLocation/bin:$PATH"
           make -C tests/cocotb/mixer SIM=icarus PYTHON_BIN="$pythonLocation/bin/python"
           make -C tests/cocotb/fir SIM=icarus PYTHON_BIN="$pythonLocation/bin/python"
           make -C tests/cocotb/fft SIM=icarus PYTHON_BIN="$pythonLocation/bin/python"
