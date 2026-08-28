@@ -35,6 +35,7 @@ jobs:
         with:
           python-version: "3.12"
       - run: python -m pip install -e . "cocotb>=1.9,<2"
+      - run: sudo apt-get update && sudo apt-get install -y iverilog
       - uses: YosysHQ/setup-oss-cad-suite@v3
       - name: Verilator lint
         run: |
@@ -43,7 +44,7 @@ jobs:
           done
       - name: cocotb RTL scoreboards
         run: |
-          export PATH="$pythonLocation/bin:$PATH"
+          export PATH="$pythonLocation/bin:/usr/bin:$PATH"
           unset PYTHONHOME
           make -C tests/cocotb/mixer SIM=icarus PYTHON_BIN="$pythonLocation/bin/python"
           make -C tests/cocotb/fir SIM=icarus PYTHON_BIN="$pythonLocation/bin/python"
