@@ -12,7 +12,6 @@ declare -A tops=(
 )
 
 for top in "${!tops[@]}"; do
-  yosys -p "read_verilog -sv ${tops[$top]}; synth -top $top; stat" \
+  yosys -p "read_verilog -sv ${tops[$top]}; synth -top $top -run coarse; stat" \
     | tee "build/synthesis/${top}.log"
 done
-
